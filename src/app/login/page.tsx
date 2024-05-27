@@ -1,19 +1,35 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoginValidationSchema } from "@/utils/ValidationSchema";
+
+interface LoginForm {
+  email: string;
+  password: string;
+}
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginForm>({
+    mode: "onSubmit",
+    resolver: zodResolver(LoginValidationSchema),
+  });
 
-  const handleLogin = (e: any) => {
-    e.preventDefault();
-    // ここでログインロジックを実装します
-    console.log("Logging in with:", email, password);
+  const handleLogin = (data: LoginForm) => {
+    // ここでサインアップロジックを実装します
+    console.log("Login with:", data);
   };
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form className="p-8 bg-white rounded shadow-md" onSubmit={handleLogin}>
+      <form
+        className="p-8 bg-white rounded shadow-md"
+        onSubmit={handleSubmit(handleLogin)}
+      >
         <h1 className="text-lg font-bold text-center mb-6">ログイン</h1>
         <div className="mb-4">
           <label
@@ -23,13 +39,14 @@ const Login = () => {
             メールアドレス
           </label>
           <input
+            {...register("email", { required: true })}
             type="email"
             id="email"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
           />
+          {errors.email && (
+            <p style={{ color: "red" }}>{errors.email.message}</p>
+          )}
         </div>
         <div className="mb-6">
           <label
@@ -39,13 +56,14 @@ const Login = () => {
             パスワード
           </label>
           <input
+            {...register("password", { required: true })}
             type="password"
             id="password"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
           />
+          {errors.password && (
+            <p style={{ color: "red" }}>{errors.password.message}</p>
+          )}
         </div>
         <button
           type="submit"
